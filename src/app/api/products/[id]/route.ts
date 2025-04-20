@@ -11,7 +11,7 @@ export async function PUT(
 ) {
   const data = await req.json();
   const product = await prisma.product.update({
-    where: { id: Number(params.id) },
+    where: { id: params.id },
     data,
   });
   return Response.json(product);
@@ -23,7 +23,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   await prisma.product.delete({
-    where: { id: Number(params.id) },
+    where: { id: params.id },
   });
   return new Response("Product deleted", { status: 200 });
 }

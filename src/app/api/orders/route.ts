@@ -1,12 +1,11 @@
-// src/app/api/orders/route.ts
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const orders = await prisma.order.findMany();
-    return Response.json(orders);
+    const Order = await prisma.order.findMany();
+    return Response.json(Order);
   } catch {
     return new Response("Failed to fetch orders", { status: 500 });
   }
@@ -16,20 +15,34 @@ export async function POST(req: Request) {
   try {
     const { buyerName, buyerContact, deliveryAddress, items } =
       await req.json();
-    if (!buyerName || !buyerContact || !deliveryAddress || !items?.length)
-      return new Response("Missing required fields", { status: 400 });
 
-    const order = await prisma.order.create({
+    if (!buyerName || !buyerContact || !deliveryAddress || !items?.length) {
+      return new Response("Missing required fields", { status: 400 });
+    }
+
+    const Order = await prisma.order.create({
       data: {
         buyerName,
         buyerContact,
         deliveryAddress,
-        items,
         status: "pending",
+        items: {
+          create: items.map(
+            (item: { productId: string; quantity: number }) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+            })
+          ),
+        },
+      },
+      include: {
+        items: true, // to return created items
       },
     });
-    return Response.json(order, { status: 201 });
-  } catch {
+
+    return Response.json(Order, { status: 201 });
+  } catch (error) {
+    console.error("Error creating order:", error);
     return new Response("Error creating order", { status: 500 });
   }
 }

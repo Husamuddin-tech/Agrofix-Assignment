@@ -1,24 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Product {
-  id    Int     @id @default(autoincrement())
-  name  String
-  price Float
+  id          String  @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  unit        String
+  stock       Int
+  image       String?
 }
-
 model Order {
-  id              Int      @id @default(autoincrement())
+  id              String       @id @default(cuid())
   buyerName       String
   buyerContact    String
   deliveryAddress String
-  items           Json
-  status          String   @default("pending")
-  createdAt       DateTime @default(now())
+  status          String       @default("pending")
+  items           OrderItem[]  // One-to-many relation with OrderItem
+  createdAt       DateTime     @default(now())
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  productId String
+  quantity  Int
 }

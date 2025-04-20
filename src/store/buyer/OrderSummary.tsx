@@ -1,14 +1,7 @@
 "use client";
 
 import { useOrderStore } from "@/store/orderStore";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Button,
-  Paper,
-  Stack,
-} from "@mui/material";
+import { Typography, IconButton, Button, Paper, Stack } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 type Product = {
   id: string;
@@ -16,6 +9,7 @@ type Product = {
   price: number;
   stock: number;
 };
+import GardenBox from "@/store/GardenBox";
 
 export default function OrderSummary() {
   const { orderItems, removeFromOrder, updateQuantity, clearOrder } =
@@ -68,19 +62,27 @@ export default function OrderSummary() {
 
       {orderItems.map(
         ({ product, quantity }: { product: Product; quantity: number }) => (
-          <Box
+          <GardenBox
             key={product.id}
             display="flex"
             alignItems="center"
             justifyContent="space-between"
             mb={2}
+            sx={{
+              mt: 4,
+              p: 3,
+              transition: "transform 0.2s",
+              "&:hover": {
+                transform: "scale(1.02)",
+              },
+            }}
           >
-            <Box>
+            <GardenBox>
               <Typography>{product.name}</Typography>
               <Typography variant="body2" color="text.secondary">
                 ₹{product.price} × {quantity} = ₹{product.price * quantity}
               </Typography>
-            </Box>
+            </GardenBox>
 
             <Stack direction="row" alignItems="center" spacing={1}>
               <Button
@@ -104,7 +106,7 @@ export default function OrderSummary() {
                 <Delete />
               </IconButton>
             </Stack>
-          </Box>
+          </GardenBox>
         )
       )}
 
